@@ -1,0 +1,24 @@
+# --- End-user secrets: never commit these ---
+.env
+.env.*
+!.env.example
+envs/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# --- Logs / temp ---
+*.log
+*.tmp
+
+# --- BMAD tooling (local only) ---
+/.bmad-loop/
+/.claude/
+/_bmad/
+/_bmad-output/
