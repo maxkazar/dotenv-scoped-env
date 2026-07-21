@@ -26,8 +26,8 @@ dotenv_scoped_env [scope] [file...]
 When called, `dotenv_scoped_env`:
 
 1. Takes a `scope` as its first argument (default: `default`).
-2. Takes an optional list of files as the remaining arguments (default:
-   `.env`, then `.env.mcp`).
+2. Takes an optional list of files as the remaining arguments (default: a
+   single `.env`).
 3. Walks up from the current directory to find the **nearest ancestor** that
    contains an `envs/<scope>/` directory.
 4. Loads the requested files from it, in order (later files override earlier
@@ -93,12 +93,13 @@ Pass the files you want after the scope. They load in order, so later files
 override earlier ones:
 
 ```bash
-dotenv_scoped_env default .env .env.mcp        # the default set, made explicit
-dotenv_scoped_env default .env .env.local      # skip .env.mcp, add .env.local
+dotenv_scoped_env default .env                 # the default, made explicit
+dotenv_scoped_env default .env .env.mcp        # add .env.mcp on top of .env
+dotenv_scoped_env default .env .env.local      # add .env.local instead
 dotenv_scoped_env staging .env                 # a single file from envs/staging
 ```
 
-With no file arguments, the default list `.env .env.mcp` is used.
+With no file arguments, only `.env` is loaded.
 
 ### Example tree
 
@@ -128,8 +129,8 @@ Pass the files as arguments after the scope — no need to edit the plugin:
 dotenv_scoped_env default .env .env.mcp .env.local
 ```
 
-Later entries win. If you omit the file arguments entirely, the built-in default
-list `.env .env.mcp` is used.
+Later entries win. If you omit the file arguments entirely, only the built-in
+default `.env` is loaded.
 
 ## Development
 

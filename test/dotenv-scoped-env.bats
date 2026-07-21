@@ -32,12 +32,12 @@ teardown() {
 	rm -rf "$WS"
 }
 
-@test "default call loads .env then .env.mcp from envs/default" {
+@test "default call loads only .env from envs/default" {
 	run dotenv_scoped_env
 	[ "$status" -eq 0 ]
 	[ "${lines[0]}" = "LOAD:.env" ]
-	[ "${lines[1]}" = "LOAD:.env.mcp" ]
-	[ "${#lines[@]}" -eq 2 ]
+	# .env.mcp exists in the fixture but is NOT in the default list.
+	[ "${#lines[@]}" -eq 1 ]
 }
 
 @test "scope-only call resolves the named scope with default file list" {
@@ -86,8 +86,7 @@ teardown() {
 	[ "$status" -eq 0 ]
 	# Pin the absolute expected output, not just equality between two calls.
 	[ "${lines[0]}" = "LOAD:.env" ]
-	[ "${lines[1]}" = "LOAD:.env.mcp" ]
-	[ "${#lines[@]}" -eq 2 ]
+	[ "${#lines[@]}" -eq 1 ]
 	local default_out="$output"
 
 	run dotenv_scoped_env default
