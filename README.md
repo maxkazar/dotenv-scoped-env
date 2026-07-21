@@ -12,9 +12,10 @@ any project's `.envrc`.
 
 direnv automatically sources every `*.sh` file in
 `~/.config/direnv/lib/` into every `.envrc` it evaluates. That is direnv's
-plugin mechanism. Installing this plugin therefore just means symlinking our
-library file into that directory — after which `dotenv_scoped_env` is available
-in every `.envrc` on your machine.
+plugin mechanism. Installing this plugin therefore just means putting our
+library file into that directory — a copy by default, or a symlink with
+`--link` — after which `dotenv_scoped_env` is available in every `.envrc` on
+your machine.
 
 Its signature is:
 
@@ -43,25 +44,37 @@ When called, `dotenv_scoped_env`:
 
 ## Installation
 
+One line — no clone required. It copies the single plugin file into
+`${XDG_CONFIG_HOME:-$HOME/.config}/direnv/lib/`, creating the directory if
+needed:
+
 ```bash
-git clone https://github.com/<your-user>/dotenv-scoped-env.git
-cd dotenv-scoped-env
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/maxkazar/dotenv-scoped-env/main/install.sh | bash
 ```
 
-`install.sh` is idempotent — it symlinks `lib/dotenv-scoped-env.sh` into
-`${XDG_CONFIG_HOME:-$HOME/.config}/direnv/lib/`, creating the directory if
-needed.
+`install.sh` is idempotent, so running it again just refreshes the installed
+copy — that is also how you **update** (re-run the same one-liner). After that
+the repository is not needed; the plugin is a self-contained copy.
+
+### For contributors
+
+Work from a checkout and install with `--link` instead, so the plugin in
+direnv's lib dir is a **symlink** back to the repo:
+
+```bash
+git clone https://github.com/maxkazar/dotenv-scoped-env.git
+cd dotenv-scoped-env
+./install.sh --link
+```
+
+With `--link`, `git pull` updates the plugin in place — the symlink already
+points at the repo, so no reinstall is required.
 
 ### Updating
 
-Pull the latest changes; the symlink already points at the repo, so no
-reinstall is required:
-
-```bash
-cd dotenv-scoped-env
-git pull
-```
+- **Installed via the one-liner (copy):** re-run the one-liner, or from a
+  checkout run `./install.sh --update`.
+- **Installed with `--link`:** just `git pull` in the checkout.
 
 ## Usage
 
