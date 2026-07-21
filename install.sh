@@ -16,7 +16,8 @@ lib_dir="${XDG_CONFIG_HOME:-$HOME/.config}/direnv/lib"
 target="$lib_dir/dotenv-scoped-env.sh"
 
 mkdir -p "$lib_dir"
-ln -sf "$source_file" "$target"
+# -n: don't dereference an existing symlink-to-dir at $target; -f: overwrite.
+ln -sfn "$source_file" "$target"
 
 echo "dotenv-scoped-env installed:"
 echo "  $target -> $source_file"

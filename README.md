@@ -16,20 +16,28 @@ plugin mechanism. Installing this plugin therefore just means symlinking our
 library file into that directory — after which `dotenv_scoped_env` is available
 in every `.envrc` on your machine.
 
+Its signature is:
+
+```bash
+dotenv_scoped_env [scope] [file...]
+```
+
 When called, `dotenv_scoped_env`:
 
-1. Takes a `scope` argument (default: `default`).
-2. Walks up from the current directory to find the **nearest ancestor** that
+1. Takes a `scope` as its first argument (default: `default`).
+2. Takes an optional list of files as the remaining arguments (default:
+   `.env`, then `.env.mcp`).
+3. Walks up from the current directory to find the **nearest ancestor** that
    contains an `envs/<scope>/` directory.
-3. Loads these files from it, in order (later files override earlier ones):
-   `.env`, then `.env.mcp` — each via direnv's `dotenv_if_exists`, so a missing
-   file is simply skipped.
-4. If no `envs/<scope>/` is found anywhere up the tree, prints a warning to
+4. Loads the requested files from it, in order (later files override earlier
+   ones) — each via direnv's `dotenv_if_exists`, so a missing file is simply
+   skipped.
+5. If no `envs/<scope>/` is found anywhere up the tree, prints a warning to
    stderr and returns without error.
 
 ## Requirements
 
-- [direnv](https://direnv.net/) >= 2.x
+- [direnv](https://direnv.net/) >= 2.21 (for `dotenv_if_exists`)
 - `bash` (the library uses bash arrays)
 - macOS or Linux
 
@@ -66,6 +74,19 @@ dotenv_scoped_env default
 or simply `dotenv_scoped_env` (the scope defaults to `default`). Then run
 `direnv allow` once, as usual.
 
+#### Choosing which files to load
+
+Pass the files you want after the scope. They load in order, so later files
+override earlier ones:
+
+```bash
+dotenv_scoped_env default .env .env.mcp        # the default set, made explicit
+dotenv_scoped_env default .env .env.local      # skip .env.mcp, add .env.local
+dotenv_scoped_env staging .env                 # a single file from envs/staging
+```
+
+With no file arguments, the default list `.env .env.mcp` is used.
+
 ### Example tree
 
 ```
@@ -88,13 +109,27 @@ copies needed.
 
 ## Extending the file list
 
-The set of files to load lives in a local array inside the function:
+Pass the files as arguments after the scope — no need to edit the plugin:
 
 ```bash
-local -a env_files=(.env .env.mcp)
+dotenv_scoped_env default .env .env.mcp .env.local
 ```
 
-Add entries (e.g. `.env.local`) to load more layers. Later entries win.
+Later entries win. If you omit the file arguments entirely, the built-in default
+list `.env .env.mcp` is used.
+
+## Development
+
+The plugin is pure bash and is checked with [shellcheck](https://www.shellcheck.net/)
+and tested with [bats](https://github.com/bats-core/bats-core):
+
+```bash
+shellcheck lib/dotenv-scoped-env.sh install.sh
+bats test/
+```
+
+Both run automatically on every push and pull request via GitHub Actions
+(see `.github/workflows/ci.yml`).
 
 ## Backward compatibility
 
